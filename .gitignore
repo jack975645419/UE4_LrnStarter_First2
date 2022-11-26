@@ -1,0 +1,11 @@
+/.vs
+/.idea
+
+/Intermediate
+/DerivedDataCache
+/Saved
+/WindowsNoEditor
+/Binaries
+/Build
+/*.sln
+# gitignore自身也需要同步，这样比较方便
