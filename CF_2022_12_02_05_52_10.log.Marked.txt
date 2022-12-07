@@ -58,6 +58,7 @@ cherry3
 [Log][2022-12-02 05:52:10 591][:1] [wenjiezou] WNLogger.PrintIdentifyLog records the first runtime version -1-
 [Log][2022-12-02 05:52:10 591][:1] Native Info: 
 EnableCustomAllocator: False
+another branch 1
 [Log][2022-12-02 05:52:10 591][:1] [junfupan]CheckCurrentLoginABShouldBeExist Called
 [Log][2022-12-02 05:52:10 591][:1] [junfupan]CheckCurrentLoginABShouldBeExist no local Login.unity3d file
 [Log][2022-12-02 05:52:10 591][:1] [junfupan] LoadingSmileGate.LoadingTimi load login from resource
