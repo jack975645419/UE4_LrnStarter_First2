@@ -9,9 +9,6 @@
 
 
 
-[Log][2022-12-02 05:52:10 591][:1] Invoke JNI Method: GetAndroidAPIVersion
-[Log][2022-12-02 05:52:10 591][:1] Device info: 
-            DeviceId              : 29b1501686c9bf0b7fdcb23070313ebc
             deviceType            : Handheld
             deviceModel           : Xiaomi 21051182C
             deviceName            : <unknown>
