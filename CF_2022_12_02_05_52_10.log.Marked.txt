@@ -1,4 +1,7 @@
 
+
+nf 1
+
 ------------------/storage/emulated/0/Android/da
 another branch 1
 ffbranch
@@ -21,7 +24,7 @@ matster 开发 1
             deviceModel           : Xiaomi 21051182C
             deviceName            : <unknown>
             operatingSystem       : Android OS 11 / API-30 (RKQ1.200826.002/V13.0.9.0.RKXCNXM)
-            systemMemorySize      : 5501
+       nf 2     systemMemorySize      : 5501
             graphicsDeviceName    : Adreno (TM) 640
             graphicsDeviceVersion : OpenGL ES 3.2 V@0502.0 (GIT@42297a4, I9e9b240040, 1616178534) (Date:03/19/21)
             graphicsMemorySize    : 2048
@@ -68,7 +71,7 @@ another branch 1
 [Log][2022-12-02 05:52:10 591][:1] Use Gyro
 [Log][2022-12-02 05:52:10 591][:1] [Profiler.Timer] Timer: GameClientManager.CheckGameFramework, Takes 1.40667E-05 seconds. 
 [Log][2022-12-02 05:52:13 633][:154] ReadBuildScreenOffset 30 -30 0 0 0
-[Log][2022-12-02 05:52:13 633][:154] Create GameFramework Start
+[Log][2022-12-02 05:52:13 nf 1nf 1nf 1nf 1nf 1nf 1nf 1nf 33333 633][:154] Create GameFramework Start
 [Log][2022-12-02 05:52:13 633][:154] ReGeng.OnInitApp
 [Log][2022-12-02 05:52:13 633][:154] [xclient]:current version is: 5.0.1
 [Log][2022-12-02 05:52:13 633][:154] [xclient]:end tapm init flag : 0
