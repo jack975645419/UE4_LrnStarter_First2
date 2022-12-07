@@ -2,7 +2,7 @@ in yantifirst
 
 continue yanti 2
 
-dd
+ddsq
 
 cointinue yanti3 3 3 3
 [JustClean] C:\CFMobile\Client\Assets\Models
@@ -40,15 +40,15 @@ A    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZh
 U    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Materials\1p_JiuShiZhu_A.mat
 U    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Materials\1p_JiuShiZhu_A.mat.meta
 the output 1
-
+sq2
 A    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Materials\1p_JiuShiZhu_A_pbr.mat
 A    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Materials\1p_JiuShiZhu_A_pbr.mat.meta
 U    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Materials\1p_JiuShiZhu_C.mat
 U    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Materials\1p_JiuShiZhu_C.mat.meta
-D    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\JiuShiZhu_albedo_C.tga.meta
+D    C:\CFMobi(1条消息) 主题：快进式合并 和 非快进式合并_一只特立独行的_小猫的博客-CSDN博客_快进合并 https://blog.csdn.net/weixin_42051619/article/details/107449425le\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\JiuShiZhu_albedo_C.tga.meta
 D    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\UnCompress_JiuShiZhu_n_r_C.tga.meta
 D    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\JiuShiZhu_ao_x_m_C.tga
-D    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\JiuShiZhu_albedo_C.tga
+D    C:(1条消息) 主题：快进式合并 和 非快进式合并_一只特立独行的_小猫的博客-CSDN博客_快进合并 https://blog.csdn.net/weixin_42051619/article/details/107449425\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\JiuShiZhu_albedo_C.tga
 D    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\UnCompress_JiuShiZhu_n_r_C.tga
 D    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\JiuShiZhu_ao_x_m_C.tga.meta
 A    C:\CFMobile\Client\Assets\Models\Weapons\MainWeapon\MainWeapon_165_JiuShiZhu\Texture\Nomipmap_JiuShiZhu_A.tga
