@@ -52,7 +52,7 @@ cherrypick2
             Svn             : 1501858
             GCTVersionMode  : Publish
             TrunkOrBranch   : Branch
-
+cherry3
 [Log][2022-12-02 05:52:10 591][:1] Print runtime record: 
 [Log][2022-12-02 05:52:10 591][:1] [wenjiezou] WNLogger.PrintIdentifyLog records the first runtime version -1-
 [Log][2022-12-02 05:52:10 591][:1] Native Info: 
