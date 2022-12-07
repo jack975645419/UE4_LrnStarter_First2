@@ -30,7 +30,7 @@ cheerrrry1
             supportsGyroscope     : True
             il2cpp                : True
             abi                   : 64bit
-
+cherrypick2
 【书签】本地没有Res_XX，内网版本属正常现象 [Log][2022-12-02 05:52:10 591][:1] [taoxu] PersistanceDataUtil.GetResourcePackageVersionFromFile versionfile is not exist!
 [Log][2022-12-02 05:52:10 591][:1] [taoxu] PersistanceDataUtil.GetResourcePackageVersionFromFile Get Resource VersionFrom file:0.0.1.0
 [Log][2022-12-02 05:52:10 591][:1] [wenjiezou] GlobalVariables.IsBigPackage decide m_BigPackage:EBPS_Small
