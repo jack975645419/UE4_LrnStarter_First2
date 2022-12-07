@@ -24,7 +24,7 @@ matster 开发 1
             deviceModel           : Xiaomi 21051182C
             deviceName            : <unknown>
             operatingSystem       : Android OS 11 / API-30 (RKQ1.200826.002/V13.0.9.0.RKXCNXM)
-            systemMemorySize      : 5501
+       nf 2     systemMemorySize      : 5501
             graphicsDeviceName    : Adreno (TM) 640
             graphicsDeviceVersion : OpenGL ES 3.2 V@0502.0 (GIT@42297a4, I9e9b240040, 1616178534) (Date:03/19/21)
             graphicsMemorySize    : 2048
