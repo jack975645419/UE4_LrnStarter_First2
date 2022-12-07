@@ -1,7 +1,2 @@
 
-------------------/storage/emulated/0/Android/data/com.tencent.tmgp.cf/cache/Cache/Log/CF_2022_12_02_05_52_10.log--------------------
-[Log][2022-12-02 05:52:10 591] Logger Beginning
-[Log][2022-12-02 05:52:10 591][:1] Apollo RegisterExceptionHandler
-[Log][2022-12-02 05:52:10 591][:1] model: xiaomi 21051182c
-[Log][2022-12-02 05:52:10 591][:1] Invoke JNI Method: GetAndroidAPIVersion
-[Log][2022-12-02 05:52:10 591][:1] Device info: 
+------------------/storage/emulated/0/Android/da
