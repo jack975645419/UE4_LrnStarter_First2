@@ -23,7 +23,7 @@ class FIRST2_API ISimpleIntf
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-//原生的CPP接口，没有被UFUNCTION修饰
+//原生的CPP接口，没有被UFUNCTION修饰，那么就必须要用virtual修饰
 	virtual void Interface_cpp(const FString str) = 0;
 
 	//在子类中实现，但是无须调回来，因为接口本身没有实现。
@@ -35,5 +35,6 @@ UFUNCTION(BlueprintImplementableEvent)
 void ImplementableInterf(const FString & str);
 
 
+	
 	
 };

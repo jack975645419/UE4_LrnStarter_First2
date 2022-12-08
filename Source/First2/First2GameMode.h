@@ -3,10 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FMDTask.h"
+#include "FMyThreadTest.h"
+#include "FTaskGraphTes.h"
+#include "RawClas.h"
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "First2GameMode.generated.h"
 
+// DEFINE_LOG_CATEGORY(TheGMLog) 和 DECLARE_LOG_CATEGORY_EXTERN(TheGMLog, Log, All) 是配套使用的
+DECLARE_LOG_CATEGORY_EXTERN(TheGMLog, Log, All)
 
 UENUM(BlueprintType)
 enum class ECppScoreLevel:uint8
@@ -29,6 +35,17 @@ public:
 	void Sample1() const;
 	void REquestAsyncLoad_Example();
 	void BeginPlay();
+
+	//下面若干关于指针的用法，来自于 【UE4 C++ 基础知识】<15> 智能指针 TSharedPtr、UniquePtr、TWeakPtr、TSharedRef - 知乎 https://zhuanlan.zhihu.com/p/472486869
+	TSharedPtr<RawClas> HowToUseSharedPtr();
+	void HowToUseSharedRef();
+	void HowToUseTWeakPtr();
+	void HowToUseUniquePtr();
+	void CastExample();
+	void HowToCastRef();
+	//指针用法结束
+	
+	void HowToUseTMapAndTSet();
 	void TimerFunction();
 	void OnLoadFinish();
 
@@ -136,4 +153,90 @@ public:
 	void CallCppInterface(AActor* SomeActor);
 	void CallNativeEventIntf(AActor* SomeActor);
 	void CallImplementationIntf(AActor* SomeActor);
+	void TimerWorkExample();
+	void HowToNewObject();
+	void HowToUseCustomLog();
+
+
+	// 下面的代码是线程相关的，配合FMyThreadTest 
+	// [UE4 C++入门到进阶]9.多线程图文(1/3) - 哔哩哔哩 https://www.bilibili.com/read/cv9453564
+	UFUNCTION(Exec)
+	virtual void RunThread(const FString& ThreadName)
+	{
+		FMyThreadTest::JoyInit(ThreadName);
+	}
+
+	UFUNCTION(Exec)
+	virtual void ShutdownThread(const FString& ThreadName)
+	{
+		FMyThreadTest::Shutdown(ThreadName);
+	}
+
+	UFUNCTION(Exec)
+	virtual void Suspend(const FString& ThreadName, bool Suspend, bool UseSuspend)
+	{
+		FMyThreadTest::Suspend(ThreadName, Suspend, UseSuspend);
+	}
+
+
+	// 下面是 graph task 的用法
+	UFUNCTION(Exec)
+	void CreateTaskGraph() const
+	{
+		TGraphTask<FTaskGraphTes>::CreateTask(NULL, ENamedThreads::AnyNormalThreadNormalTask).ConstructAndDispatchWhenReady(10);
+	}
+
+
+	// 下面是 FNonAbandonableTask 的用法示例
+	UFUNCTION(Exec)
+	void Excample_FNonAban1();
+	UFUNCTION(Exec)
+	void Excample_FNonAban_Manu();
+	void TryToRecollectTask();
+
+	FAsyncTask<FMDTask>* ManTask;
+
+	UFUNCTION(Exec)
+	void Excample_FNonAban1_BG();
+	UFUNCTION(Exec)
+	void Excample_FNonAban_Manu_BG();
+
+	FTimerHandle TH;
+
+
+	// 下面是 TSubClassOf的使用示例
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AActor>TargetClas;
+
+	UFUNCTION(Exec)
+	void XMLReadExampl();
+
+	UFUNCTION(Exec)
+	void JsonReadExample();
+
+	TSharedPtr<FJsonObject> JsonOb;
+	TSharedPtr<FJsonObject> JsonObBig;
+
+	TArray<TSharedPtr<  FJsonValue >> JsonValueArray;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 };
