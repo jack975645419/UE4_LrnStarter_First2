@@ -10,7 +10,7 @@ public class First2EditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		// ExtraModuleNames.Add("First2");
-		ExtraModuleNames.AddRange(new string[] { "First2", "MyModule" });
+		ExtraModuleNames.AddRange(new string[] { "First2", });
 
 	}
 }
