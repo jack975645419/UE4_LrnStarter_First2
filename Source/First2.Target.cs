@@ -9,6 +9,6 @@ public class First2Target : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange(new string[] { "First2", });
+		ExtraModuleNames.AddRange(new string[] { "First2", "MyModule"});
 	}
 }
