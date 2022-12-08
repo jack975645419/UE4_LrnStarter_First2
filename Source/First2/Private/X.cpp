@@ -3,12 +3,19 @@
 
 #include "X.h"
 
+#include "PrivatClassInFirst.h"
+#include "First2/Backyarm/PrivaClassInFirstModule.h"
+
 int32 AX::STATIC_VALU = 20000;
 int32 AX::STATIC_VALU2 = 20;
 
 // Sets default values
 AX::AX():CONST_VALU(100)
 {
+	// 可以访问 PrivatePaths 里的变量。
+	UE_LOG(LogTemp, Warning, TEXT("---[LogByWenjie]" __FILE__ " at line %d\n%s%d%d\n    __________________"), __LINE__, *FString(""), 	PrivatClassInFirst::SHEEP, PrivaClassInFirstModule::BACK_YARM_CONST);
+
+	
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -20,6 +27,8 @@ AX::AX():CONST_VALU(100)
 	auto R = RootComponent = SphereMeshComp;
 	ConeMeshComp->SetupAttachment(R);
 	CubeMeshComp->SetupAttachment(ConeMeshComp);
+
+
 
 
 	auto ConeAssetPath = TEXT("StaticMesh'/Game/StarterContent/Shapes/Shape_Cone.Shape_Cone'");
