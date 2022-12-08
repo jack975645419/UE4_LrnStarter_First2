@@ -3,8 +3,11 @@
 
 #include "X.h"
 
+int32 AX::STATIC_VALU = 20000;
+int32 AX::STATIC_VALU2 = 20;
+
 // Sets default values
-AX::AX()
+AX::AX():CONST_VALU(100)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
