@@ -22,8 +22,11 @@ NODES_NUM = len(NODES_LIST)
 LOGS = list()
 
 FILE_NAME = f"Mutex_{BK_CI_PIPELINE_ID}.json"
-LOG_NAME = f"{BK_CI_PIPELINE_ID}.{BK_CI_BUILD_NUM}.log"
+LOG_NAME = f"{BK_CI_PIPELINE_ID}.{BK_CI_BUILD_NUM}.{'LOCK' if MUTEX_OP == _LOCK else 'UNLOCK'}.log"
 OBJ = {"waiting": [], "using": []}
+PY_MUTEX_FILE = f"PyRunLock_{BK_CI_PIPELINE_ID}.json"
+
+
 
 '''
 # 为了避免冲突，需要对齐到 BK_CI_BUILD_NUM 时，启动
@@ -53,11 +56,18 @@ def flush_log():
     write_file(LOG_NAME, '\n'.join(LOGS))
 
 def logs(st):
+    st = str(st)
     print (st)
     LOGS.append(st)
+
 def sleeps(num = SLEEP_TIME):
+    flush_log()
     time.sleep(SLEEP_TIME)
 
+def exit_script():
+    logs ("going to exit")
+    flush_log()
+    exit()
 
 def whether_obj_valid(o: dict):
     return "waiting" in o.keys() and "using" in o.keys()
@@ -91,6 +101,9 @@ def minimal_waiting():
 def empty_using():
     OBJ["using"] = list()
 
+def is_using(num):
+    return num in OBJ["using"]
+
 def remove_using(num):
     if num in OBJ["using"]:
         logs ("removing using of " + str(num))
@@ -103,6 +116,9 @@ def remove_using(num):
 def occupy(num)->int:
     while len(OBJ["using"]) < NODES_NUM:
         OBJ["using"].append(0)
+    if len(OBJ["using"]) > NODES_NUM:
+        OBJ["using"] = OBJ["using"][0:NODES_NUM]
+
     if 0 not in OBJ["using"]:
         return -1
     validHandle = OBJ["using"].index(0)
@@ -133,6 +149,17 @@ def force_write_file(filepath):
             logs ("write_file_error " + content + " and retry again ")
             sleeps()
 
+    
+
+def runnable():
+    if read_file_plain(PY_MUTEX_FILE) == str(BK_CI_BUILD_NUM):
+        time.sleep("")
+
+# Python脚本互斥锁 的初始化
+if not os.path.exists(PY_MUTEX_FILE):
+    write_file(PY_MUTEX_FILE, "0")
+
+
 # 存入初始文件
 if BK_CI_BUILD_NUM == -1:
     needReset = True
@@ -154,13 +181,18 @@ else:
 if needReset:
     reset_file()
 if BK_CI_BUILD_NUM == -1:
-    exit()
+    exit_script()
 
 if MUTEX_OP == _LOCK:
     while True:
         # 重新读一次
         OBJ = json.loads(read_file_plain(FILE_NAME))
         
+        # 如果曾经使用过，那么直接放行
+        if is_using(BK_CI_BUILD_NUM):
+            logs("using before, so go ahead!")
+            exit_script()
+
         # 加入等待
         if not is_waiting(BK_CI_BUILD_NUM):
             wait(BK_CI_BUILD_NUM)
@@ -181,8 +213,9 @@ if MUTEX_OP == _LOCK:
             logs (f"handle: {handle}")
             logs (NODES_LIST)
             logs (f"occupy successfully {handle} {NODES_LIST[handle]}")
+            logs ("setEnv NODE_INDEX {}".format(handle))
             logs("setEnv NODE_NAME {}".format(NODES_LIST[handle]))
-            exit() #【退出】
+            exit_script() #【退出】
 
 elif MUTEX_OP == _UNLOCK:
     while True:
@@ -197,7 +230,7 @@ elif MUTEX_OP == _UNLOCK:
             logs ("read fails (80)")
             sleeps()
             continue
-        exit()
+        exit_script() #【退出】
 else:
     raise "invalid"
 
