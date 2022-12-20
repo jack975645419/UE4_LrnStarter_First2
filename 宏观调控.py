@@ -11,6 +11,7 @@ import os, json, time
 BK_CI_BUILD_NUM     = ${{BUILD_NUM}}          # 构建号 （-1表示重置json）
 BK_CI_PIPELINE_ID   = "${{PIPELINE_ID}}"        # 流水线
 NODES               = "${{NODES}}"              # 机器名称列表用 逗号隔开
+DELAY_START         = ${{DELAY_START}}          # 延迟启动，默认是0
 
 _LOCK = 1 # 表示进入的位置
 _UNLOCK = 2 #表示退出的位置
@@ -25,8 +26,7 @@ FILE_NAME = f"Mutex_{BK_CI_PIPELINE_ID}.json"
 LOG_NAME = f"{BK_CI_PIPELINE_ID}.{BK_CI_BUILD_NUM}.{'LOCK' if MUTEX_OP == _LOCK else 'UNLOCK'}.log"
 OBJ = {"waiting": [], "using": []}
 PY_MUTEX_FILE = f"PyRunLock_{BK_CI_PIPELINE_ID}.json"
-
-
+FILE_PATH = "Lock.txt"
 
 '''
 # 为了避免冲突，需要对齐到 BK_CI_BUILD_NUM 时，启动
@@ -62,7 +62,7 @@ def logs(st):
 
 def sleeps(num = SLEEP_TIME):
     flush_log()
-    time.sleep(SLEEP_TIME)
+    time.sleep(num)
 
 def exit_script():
     logs ("going to exit")
@@ -101,8 +101,10 @@ def minimal_waiting():
 def empty_using():
     OBJ["using"] = list()
 
-def is_using(num):
-    return num in OBJ["using"]
+def get_using_handle(num):
+    if num in OBJ["using"]:
+        return OBJ["using"].index(num)
+    return -1
 
 def remove_using(num):
     if num in OBJ["using"]:
@@ -160,6 +162,12 @@ if not os.path.exists(PY_MUTEX_FILE):
     write_file(PY_MUTEX_FILE, "0")
 
 
+# 延迟启动
+if DELAY_START > 0:
+    logs("DelayStart: " + str(DELAY_START))
+    sleeps(DELAY_START)
+
+
 # 存入初始文件
 if BK_CI_BUILD_NUM == -1:
     needReset = True
@@ -189,8 +197,11 @@ if MUTEX_OP == _LOCK:
         OBJ = json.loads(read_file_plain(FILE_NAME))
         
         # 如果曾经使用过，那么直接放行
-        if is_using(BK_CI_BUILD_NUM):
+        usingHandle = get_using_handle(BK_CI_BUILD_NUM)
+        if usingHandle != -1:
             logs("using before, so go ahead!")
+            logs ("setEnv NODE_INDEX {}".format(usingHandle))
+            logs("setEnv NODE_NAME {}".format(NODES_LIST[usingHandle]))
             exit_script()
 
         # 加入等待
