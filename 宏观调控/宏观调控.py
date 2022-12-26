@@ -197,12 +197,8 @@ def force_write_file(filepath):
 def try_to_write(filepath) -> bool:
     content = json.dumps(OBJ)
     try:
-        if not writable():
-            sleeps(SLEEP_TIME)
-            return False
         write_file(filepath, content)
         logs("writes: " + content)
-        release_writable()
         return True
     except:
         logs ("write_file_error " + content + " and retry again ")
@@ -251,6 +247,10 @@ if BK_CI_BUILD_NUM == -1:
 
 if MUTEX_OP == _LOCK:
     while True:
+        if not writable():
+            sleeps(5) #只是争取写的权限，可以短暂睡眠
+            continue
+        
         # 重新读一次
         OBJ = json.loads(read_file_plain(FILE_NAME))
         print ("@ " + str(OBJ))
@@ -261,36 +261,46 @@ if MUTEX_OP == _LOCK:
             logs("using before, so go ahead!")
             logs ("setEnv NODE_INDEX {}".format(usingHandle))
             logs("setEnv NODE_NAME {}".format(NODES_LIST[usingHandle]))
+            release_writable()
             exit_script()
 
         # 加入等待
         if not is_waiting(BK_CI_BUILD_NUM):
             wait(BK_CI_BUILD_NUM)
             if not try_to_write(FILE_NAME): # 没写成功将会重新考虑lock流程
+                release_writable()
                 continue 
         
         # 排队（waiting）：筛选出waiting最小者考虑占位。排队后立即短休眠，能有效避免冲突，只有最小者才考虑占位，否则都睡觉就好
         if minimal_waiting() != BK_CI_BUILD_NUM:
+            release_writable()
             sleeps_with_changing_time()
             continue
         
         # 占位（using）：看using有没有空缺，有空缺就上，否则睡觉
         handle = occupy(BK_CI_BUILD_NUM)
         if handle == -1: # 占位失败，因为没有using空闲
+            release_writable()
             sleeps_with_changing_time()
-        else: # 占位成功
-            remove_waiting(BK_CI_BUILD_NUM)
-            if not try_to_write(FILE_NAME): # “功亏一篑”，没写成功将会重新考虑lock流程
-                continue
-            logs (f"handle: {handle}")
-            logs (NODES_LIST)
-            logs (f"occupy successfully {handle} {NODES_LIST[handle]}")
-            logs ("setEnv NODE_INDEX {}".format(handle))
-            logs("setEnv NODE_NAME {}".format(NODES_LIST[handle]))
-            exit_script() #【退出】
+            continue
+        # else: # 占位成功
+        remove_waiting(BK_CI_BUILD_NUM)
+        if not try_to_write(FILE_NAME): # “功亏一篑”，没写成功将会重新考虑lock流程
+            continue
+        logs (f"handle: {handle}")
+        logs (NODES_LIST)
+        logs (f"occupy successfully {handle} {NODES_LIST[handle]}")
+        logs ("setEnv NODE_INDEX {}".format(handle))
+        logs("setEnv NODE_NAME {}".format(NODES_LIST[handle]))
+        release_writable()
+        exit_script() #【退出】
 
 elif MUTEX_OP == _UNLOCK:
     while True:
+        if not writable():
+            sleeps(5) #只是争取写的权限，可以短暂睡眠
+            continue
+
         try:
             content = read_file_plain(FILE_NAME)
             logs ("going to unlock original content: " + content)
@@ -298,11 +308,14 @@ elif MUTEX_OP == _UNLOCK:
             remove_waiting(BK_CI_BUILD_NUM)
             remove_using(BK_CI_BUILD_NUM)
             if not try_to_write(FILE_NAME): # 没写成功将会重新走unlock流程
+                release_writable()
                 continue
         except:
             logs ("read fails (80)")
+            release_writable()
             sleeps(SLEEP_TIME)
             continue
+        release_writable()
         exit_script() #【退出】
 else:
     raise "invalid"
