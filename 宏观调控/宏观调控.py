@@ -135,7 +135,7 @@ def change_sleep_time():
     # 最小等待中
     if minimal_waiting() == BK_CI_BUILD_NUM:
         SLEEP_TIME = 60
-        print (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM} = minimal_waiting {minimal_waiting()}")
+        print (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM} = minimal_waiting {minimal_waiting()} and waiting = {str(OBJ['waiting'])}")
         return
 
     # 其它情况
