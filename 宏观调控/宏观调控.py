@@ -58,6 +58,7 @@ def flush_log():
 
 def logs(st):
     st = str(st)
+    st = time.strftime("%m-%d %H:%M:%S", time.localtime(time.time())) + " >> \n" + st
     print (st)
     LOGS.append(st)
 
@@ -174,6 +175,17 @@ def force_write_file(filepath):
             logs ("write_file_error " + content + " and retry again ")
             sleeps(SLEEP_TIME)
 
+def try_to_write(filepath) -> bool:
+    content = json.dumps(OBJ)
+    try:
+        write_file(filepath, content)
+        logs("writes: " + content)
+        return True
+    except:
+        logs ("write_file_error " + content + " and retry again ")
+        sleeps(SLEEP_TIME)
+        return False
+
 def runnable():
     if read_file_plain(PY_MUTEX_FILE) == str(BK_CI_BUILD_NUM):
         time.sleep("")
@@ -231,7 +243,8 @@ if MUTEX_OP == _LOCK:
         # 加入等待
         if not is_waiting(BK_CI_BUILD_NUM):
             wait(BK_CI_BUILD_NUM)
-            force_write_file(FILE_NAME)
+            if not try_to_write(FILE_NAME): # 没写成功将会重新考虑lock流程
+                continue 
         
         # 排队（waiting）：筛选出waiting最小者考虑占位。排队后立即短休眠，能有效避免冲突，只有最小者才考虑占位，否则都睡觉就好
         if minimal_waiting() != BK_CI_BUILD_NUM:
@@ -244,7 +257,8 @@ if MUTEX_OP == _LOCK:
             sleeps_with_changing_time()
         else: # 占位成功
             remove_waiting(BK_CI_BUILD_NUM)
-            force_write_file(FILE_NAME)
+            if not try_to_write(FILE_NAME): # “功亏一篑”，没写成功将会重新考虑lock流程
+                continue
             logs (f"handle: {handle}")
             logs (NODES_LIST)
             logs (f"occupy successfully {handle} {NODES_LIST[handle]}")
@@ -260,7 +274,8 @@ elif MUTEX_OP == _UNLOCK:
             OBJ = json.loads(content)
             remove_waiting(BK_CI_BUILD_NUM)
             remove_using(BK_CI_BUILD_NUM)
-            force_write_file(FILE_NAME)
+            if not try_to_write(FILE_NAME): # 没写成功将会重新走unlock流程
+                continue
         except:
             logs ("read fails (80)")
             sleeps(SLEEP_TIME)
