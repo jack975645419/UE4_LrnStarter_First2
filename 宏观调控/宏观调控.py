@@ -132,6 +132,7 @@ def occupy(num)->int:
     return validHandle
 
 def change_sleep_time():
+    global SLEEP_TIME # 经验：如果要改变全局变量，那么就声明global
     # 最小等待中
     if minimal_waiting() == BK_CI_BUILD_NUM:
         SLEEP_TIME = 60
@@ -150,6 +151,24 @@ def change_sleep_time():
 def sleeps_with_changing_time():
     change_sleep_time()
     sleeps(SLEEP_TIME)
+
+# 是否可写，基于一个前提：写PY_MUTEX_FILE后2s后如果还是同样的值，意味着争取写的机会成功了
+def writable():
+    content = read_file_plain(PY_MUTEX_FILE)
+    if content == "0" or content == str(BK_CI_BUILD_NUM):
+        write_file(PY_MUTEX_FILE, str(BK_CI_BUILD_NUM))
+        sleeps(2)
+        content = read_file_plain(PY_MUTEX_FILE)
+        return content == str(BK_CI_BUILD_NUM)
+    else:
+        logs ("not writable cause being used by: " + content)
+        return False
+
+def release_writable():
+    content = read_file_plain(PY_MUTEX_FILE)
+    if content != str(BK_CI_BUILD_NUM):
+        raise f"not valid {content} {BK_CI_BUILD_NUM}"
+    write_file(PY_MUTEX_FILE, "0")
 
 # 完全重置，没有等待，也没有使用中
 def reset_file():
@@ -178,8 +197,12 @@ def force_write_file(filepath):
 def try_to_write(filepath) -> bool:
     content = json.dumps(OBJ)
     try:
+        if not writable():
+            sleeps(SLEEP_TIME)
+            return False
         write_file(filepath, content)
         logs("writes: " + content)
+        release_writable()
         return True
     except:
         logs ("write_file_error " + content + " and retry again ")
