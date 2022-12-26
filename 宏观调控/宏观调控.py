@@ -38,7 +38,7 @@ sleepToSnap = (now - (now % 60) + 60 + (BK_CI_BUILD_NUM % 20) * 3 - now) % 60
 time.sleep(sleepToSnap)
 '''
 
-
+print (f"INFO: \nBK_CI_BUILD_NUM = {BK_CI_BUILD_NUM}\nBK_CI_PIPELINE_ID = {BK_CI_PIPELINE_ID}\nNODES = {NODES}\nDELAY_START = {DELAY_START}\nMUTEX_OP = {MUTEX_OP}\nNODES_NUM = {NODES_NUM}\nLOG_NAME = {LOG_NAME}\n ")
 
 # str版本：
 def read_file_plain(filepath):
@@ -135,8 +135,9 @@ def change_sleep_time():
     # 最小等待中
     if minimal_waiting() == BK_CI_BUILD_NUM:
         SLEEP_TIME = 60
-        print (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM}")
+        print (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM} = minimal_waiting {minimal_waiting()}")
         return
+
     # 其它情况
     num = len(OBJ["waiting"]) + len(OBJ["using"])
     _1min = 60
