@@ -38,8 +38,6 @@ sleepToSnap = (now - (now % 60) + 60 + (BK_CI_BUILD_NUM % 20) * 3 - now) % 60
 time.sleep(sleepToSnap)
 '''
 
-print (f"INFO: \nBK_CI_BUILD_NUM = {BK_CI_BUILD_NUM}\nBK_CI_PIPELINE_ID = {BK_CI_PIPELINE_ID}\nNODES = {NODES}\nDELAY_START = {DELAY_START}\nMUTEX_OP = {MUTEX_OP}\nNODES_NUM = {NODES_NUM}\nLOG_NAME = {LOG_NAME}\n ")
-
 # str版本：
 def read_file_plain(filepath):
     outf = open(filepath, "r", encoding='utf-8', errors='ignore') 
@@ -63,8 +61,9 @@ def logs(st):
     print (st)
     LOGS.append(st)
 
-def sleeps(num = SLEEP_TIME):
+def sleeps(num):
     flush_log()
+    print (f"going to sleep {num}")
     time.sleep(num)
 
 
@@ -149,7 +148,7 @@ def change_sleep_time():
 
 def sleeps_with_changing_time():
     change_sleep_time()
-    sleeps()
+    sleeps(SLEEP_TIME)
 
 # 完全重置，没有等待，也没有使用中
 def reset_file():
@@ -162,7 +161,7 @@ def reset_file():
             return
         except:
             logs ("reset_file fails")
-            sleeps()
+            sleeps(SLEEP_TIME)
 
 def force_write_file(filepath):
     content = json.dumps(OBJ)
@@ -173,16 +172,18 @@ def force_write_file(filepath):
             return
         except:
             logs ("write_file_error " + content + " and retry again ")
-            sleeps()
+            sleeps(SLEEP_TIME)
 
 def runnable():
     if read_file_plain(PY_MUTEX_FILE) == str(BK_CI_BUILD_NUM):
         time.sleep("")
 
+# 程序开始
+logs (f"INFO: \nBK_CI_BUILD_NUM = {BK_CI_BUILD_NUM}\nBK_CI_PIPELINE_ID = {BK_CI_PIPELINE_ID}\nNODES = {NODES}\nDELAY_START = {DELAY_START}\nMUTEX_OP = {MUTEX_OP}\nNODES_NUM = {NODES_NUM}\nLOG_NAME = {LOG_NAME}\n ")
+
 # Python脚本互斥锁 的初始化
 if not os.path.exists(PY_MUTEX_FILE):
     write_file(PY_MUTEX_FILE, "0")
-
 
 # 延迟启动
 if DELAY_START > 0:
@@ -217,7 +218,8 @@ if MUTEX_OP == _LOCK:
     while True:
         # 重新读一次
         OBJ = json.loads(read_file_plain(FILE_NAME))
-        
+        print ("@ " + str(OBJ))
+
         # 如果曾经使用过，那么直接放行
         usingHandle = get_using_handle(BK_CI_BUILD_NUM)
         if usingHandle != -1:
@@ -231,14 +233,14 @@ if MUTEX_OP == _LOCK:
             wait(BK_CI_BUILD_NUM)
             force_write_file(FILE_NAME)
         
-        # 排队（waiting），排队后立即短休眠，能有效避免冲突
+        # 排队（waiting）：筛选出waiting最小者考虑占位。排队后立即短休眠，能有效避免冲突，只有最小者才考虑占位，否则都睡觉就好
         if minimal_waiting() != BK_CI_BUILD_NUM:
-            sleeps(2)
+            sleeps_with_changing_time()
             continue
         
-        # 占位（using）
+        # 占位（using）：看using有没有空缺，有空缺就上，否则睡觉
         handle = occupy(BK_CI_BUILD_NUM)
-        if handle == -1: # 占位失败
+        if handle == -1: # 占位失败，因为没有using空闲
             sleeps_with_changing_time()
         else: # 占位成功
             remove_waiting(BK_CI_BUILD_NUM)
@@ -261,7 +263,7 @@ elif MUTEX_OP == _UNLOCK:
             force_write_file(FILE_NAME)
         except:
             logs ("read fails (80)")
-            sleeps()
+            sleeps(SLEEP_TIME)
             continue
         exit_script() #【退出】
 else:
