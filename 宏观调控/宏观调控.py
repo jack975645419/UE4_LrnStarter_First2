@@ -13,6 +13,8 @@ BK_CI_PIPELINE_ID   = "${{PIPELINE_ID}}"        # 流水线
 NODES               = "${{NODES}}"              # 机器名称列表用 逗号隔开
 DELAY_START         = ${{DELAY_START}}          # 延迟启动，默认是0
 
+PREFER_MASK_STR         = "${{PREFER_MASK}}"        # 偏好，例如是 1,1,1,0,0 表示只使用前面提供的三台机器，如果没有提供，那么用1来补齐
+
 _LOCK = 1 # 表示进入的位置
 _UNLOCK = 2 #表示退出的位置
 
@@ -27,6 +29,11 @@ LOG_NAME = f"{BK_CI_PIPELINE_ID}.{BK_CI_BUILD_NUM}.{'LOCK' if MUTEX_OP == _LOCK 
 OBJ = {"waiting": [], "using": []}
 PY_MUTEX_FILE = f"PyRunLock_{BK_CI_PIPELINE_ID}.json"
 FILE_PATH = "Lock.txt"
+
+PREFER_MASK_LIST = PREFER_MASK_STR.split(",")
+PREFER_MASK_LIST = [int(each) for each in PREFER_MASK_LIST]
+while len(PREFER_MASK_LIST) < NODES_NUM:
+    PREFER_MASK_LIST.append(1)
 
 '''
 # 为了避免冲突，需要对齐到 BK_CI_BUILD_NUM 时，启动
@@ -125,9 +132,15 @@ def occupy(num)->int:
     if len(OBJ["using"]) > NODES_NUM:
         OBJ["using"] = OBJ["using"][0:NODES_NUM]
 
-    if 0 not in OBJ["using"]:
+    validHandle = -1
+    for va in range(NODES_NUM):
+        if PREFER_MASK_LIST[va] == 1 and OBJ["using"][va] == 0:
+            validHandle = va
+            break
+
+    if validHandle == -1:
         return -1
-    validHandle = OBJ["using"].index(0)
+
     OBJ["using"][validHandle] = num
     return validHandle
 
@@ -210,7 +223,7 @@ def runnable():
         time.sleep("")
 
 # 程序开始
-logs (f"INFO: \nBK_CI_BUILD_NUM = {BK_CI_BUILD_NUM}\nBK_CI_PIPELINE_ID = {BK_CI_PIPELINE_ID}\nNODES = {NODES}\nDELAY_START = {DELAY_START}\nMUTEX_OP = {MUTEX_OP}\nNODES_NUM = {NODES_NUM}\nLOG_NAME = {LOG_NAME}\n ")
+logs (f"INFO: \nBK_CI_BUILD_NUM = {BK_CI_BUILD_NUM}\nBK_CI_PIPELINE_ID = {BK_CI_PIPELINE_ID}\nNODES = {NODES}\nDELAY_START = {DELAY_START}\nMUTEX_OP = {MUTEX_OP}\nNODES_NUM = {NODES_NUM}\nLOG_NAME = {LOG_NAME}\nPREFER_LIST = {PREFER_MASK_LIST}\n ")
 
 # Python脚本互斥锁 的初始化
 if not os.path.exists(PY_MUTEX_FILE):
