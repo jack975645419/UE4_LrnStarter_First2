@@ -5,7 +5,7 @@
 
 暂时不考虑写冲突的事情
 后续调试好了之后，把print功能去掉，避免影响机器性能
-
+特殊规则见 def custom_usable_condition(num):
 
 【单元测试说明】
 修改并使用 hg10_transform_run.cmd 生成批量的py脚本
@@ -89,7 +89,6 @@ def sleeps(num):
     print (f"going to sleep {num}")
     time.sleep(num)
 
-
 def exit_script():
     logs ("going to exit")
     flush_log()
@@ -140,6 +139,13 @@ def remove_using(num):
     else:
         logs ("no need to remove using of " + str(num))
 
+# 特殊条件
+def custom_usable_condition(nodeName):
+    if nodeName == "Engine_Bake_3090_02":
+        curHour = time.localtime().tm_hour
+        return curHour >= 21 or curHour <= 10
+    return True
+
 # 返回 -1 表示用不了
 def occupy(num)->int:
     while len(OBJ["using"]) < NODES_NUM:
@@ -148,8 +154,13 @@ def occupy(num)->int:
         OBJ["using"] = OBJ["using"][0:NODES_NUM]
 
     validHandle = -1
+
     for va in range(NODES_NUM):
+
         if PREFER_MASK_LIST[va] == 1 and OBJ["using"][va] == 0:
+            if not custom_usable_condition(NODES_LIST[va]):
+                logs (f"special condition not satisfied: {NODES_LIST[va]} {va}")
+                continue
             validHandle = va
             break
 
@@ -163,8 +174,8 @@ def change_sleep_time():
     global SLEEP_TIME # 经验：如果要改变全局变量，那么就声明global
     # 最小等待中
     if minimal_waiting() == BK_CI_BUILD_NUM:
-        SLEEP_TIME = 60
-        print (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM} = minimal_waiting {minimal_waiting()} and waiting = {str(OBJ['waiting'])}")
+        SLEEP_TIME = 30
+        logs (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM} = minimal_waiting {minimal_waiting()} and waiting = {str(OBJ['waiting'])}")
         return
 
     # 其它情况
