@@ -5,6 +5,19 @@
 
 暂时不考虑写冲突的事情
 后续调试好了之后，把print功能去掉，避免影响机器性能
+
+
+【单元测试说明】
+修改并使用 hg10_transform_run.cmd 生成批量的py脚本
+使用 hg16_run.cmd 来运行，观察效果：
+1. 全部都能正常退出，脚本不会报错
+2. Mutex_testing.json 最终会归零
+3. PyRunLock_testing.json 最终会归零
+
+4. 修改好了该脚本后，要记得在 【工具_调查构建机磁盘空间】 线里做检验。
+
+最终：要保管好这个脚本文件
+
 '''
 import os, json, time, random
 
@@ -13,7 +26,7 @@ BK_CI_PIPELINE_ID   = "${{PIPELINE_ID}}"        # 流水线
 NODES               = "${{NODES}}"              # 机器名称列表用 逗号隔开
 DELAY_START         = ${{DELAY_START}}          # 延迟启动，默认是0
 
-PREFER_MASK_STR         = "${{PREFER_MASK}}"        # 偏好，例如是 1,1,1,0,0 表示只使用前面提供的三台机器，如果没有提供，那么用1来补齐
+PREFER_MASK_STR         = "${{PREFER_MASK_STR}}"        # 偏好，例如是 1,1,1,0,0 表示只使用前面提供的三台机器，如果没有提供，那么用1来补齐
 
 _LOCK = 1 # 表示进入的位置
 _UNLOCK = 2 #表示退出的位置
@@ -30,10 +43,12 @@ OBJ = {"waiting": [], "using": []}
 PY_MUTEX_FILE = f"PyRunLock_{BK_CI_PIPELINE_ID}.json"
 FILE_PATH = "Lock.txt"
 
+if PREFER_MASK_STR == "":
+    PREFER_MASK_STR = "1"
 PREFER_MASK_LIST = PREFER_MASK_STR.split(",")
-PREFER_MASK_LIST = [int(each) for each in PREFER_MASK_LIST]
 while len(PREFER_MASK_LIST) < NODES_NUM:
-    PREFER_MASK_LIST.append(1)
+    PREFER_MASK_LIST.append("1")
+PREFER_MASK_LIST = [int(each) for each in PREFER_MASK_LIST]
 
 '''
 # 为了避免冲突，需要对齐到 BK_CI_BUILD_NUM 时，启动
