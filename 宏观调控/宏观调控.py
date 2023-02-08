@@ -139,9 +139,11 @@ def remove_using(num):
     else:
         logs ("no need to remove using of " + str(num))
 
-# 特殊条件
+# 特殊条件：
+# 加入特殊条件：Engine_Bake_3090_02 在夜间（21:00~10:00）才允许运行
+
 def custom_usable_condition(nodeName):
-    if nodeName == "Engine_Bake_3090_02":
+    if nodeName == "Engine_Bake_3090_02" and (BK_CI_PIPELINE_ID == "Baking" or BK_CI_PIPELINE_ID == "BakingPC"):
         curHour = time.localtime().tm_hour
         return curHour >= 21 or curHour <= 10
     return True
@@ -282,6 +284,9 @@ else:
 if needReset:
     reset_file()
 if BK_CI_BUILD_NUM == -1:
+    # 如果是-1则还有一个操作需要处理，那就是将PyRun锁给删除掉。
+    os.remove(PY_MUTEX_FILE)
+    logs("cause Build_Num is -1, remove PyMutexFile")
     exit_script()
 
 if MUTEX_OP == _LOCK:
