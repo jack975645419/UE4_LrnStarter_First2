@@ -15,6 +15,7 @@ AVisiInM4::AVisiInM4()
 	PrimaryActorTick.bCanEverTick = true;
 AAA::Hi2();
 	CanUsePrivInFirst::foo2();
+	PrivaClassInFirstModule::BACK_YARM_CONST;
 	
 }
 

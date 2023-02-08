@@ -5,13 +5,16 @@
 #include "CoreMinimal.h"
 #include "PrivaClassInFirstModule.h"
 #include "PublicClasInFirstModule.h"
+#include "AAA.generated.h"
 
 
 /**
  * 
  */
+UCLASS()
 class FIRST2_API AAA:public AActor
 {
+	GENERATED_BODY()
 public:
 	void Hi()
 	{

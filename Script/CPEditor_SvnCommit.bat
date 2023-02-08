@@ -32,6 +32,11 @@ Content/GenTexDirHD/Game/Maps/BC_HD ^
 Content/GenTexDirHD ^
 Content/Environment/Biome ^
 Content/Battlefield ^
+Content/Environment ^
+Content/GenTexDir ^
+Content/Maps/BC_HD ^
+Content/Maps/BuildMaps ^
+Content/Maps ^
 Content
 
 rem 父目录强制Add --- 
