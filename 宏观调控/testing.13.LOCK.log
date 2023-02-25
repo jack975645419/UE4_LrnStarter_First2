@@ -1,0 +1,31 @@
+02-16 12:24:14 >> 
+INFO: 
+BK_CI_BUILD_NUM = 13
+BK_CI_PIPELINE_ID = testing
+NODES = node1,Engine_Bake_3090_02
+DELAY_START = 0
+MUTEX_OP = 1
+NODES_NUM = 2
+LOG_NAME = testing.13.LOCK.log
+PREFER_LIST = [1, 1]
+ 
+02-16 12:24:14 >> 
+original content: {"waiting": [], "using": [11, 0]}
+02-16 12:24:16 >> 
+writes: {"waiting": [13], "using": [11, 0]}
+02-16 12:24:16 >> 
+remove waiting 13
+02-16 12:24:16 >> 
+writes: {"waiting": [], "using": [11, 13]}
+02-16 12:24:16 >> 
+handle: 1
+02-16 12:24:16 >> 
+['node1', 'Engine_Bake_3090_02']
+02-16 12:24:16 >> 
+occupy successfully 1 Engine_Bake_3090_02
+02-16 12:24:16 >> 
+setEnv NODE_INDEX 1
+02-16 12:24:16 >> 
+setEnv NODE_NAME Engine_Bake_3090_02
+02-16 12:24:16 >> 
+going to exit

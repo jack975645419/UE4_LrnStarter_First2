@@ -1,0 +1,33 @@
+02-16 12:24:12 >> 
+INFO: 
+BK_CI_BUILD_NUM = 12
+BK_CI_PIPELINE_ID = testing
+NODES = node1,Engine_Bake_3090_02
+DELAY_START = 100
+MUTEX_OP = 1
+NODES_NUM = 2
+LOG_NAME = testing.12.LOCK.log
+PREFER_LIST = [1, 1]
+ 
+02-16 12:24:12 >> 
+DelayStart: 100
+02-16 12:25:52 >> 
+original content: {"waiting": [15], "using": [11, 13]}
+02-16 12:25:54 >> 
+writes: {"waiting": [15, 12], "using": [11, 13]}
+02-16 12:25:54 >> 
+set sleep time as 30 cause it is minimal waiting 12 = minimal_waiting 12 and waiting = [15, 12]
+02-16 12:26:26 >> 
+set sleep time as 30 cause it is minimal waiting 12 = minimal_waiting 12 and waiting = [15, 12]
+02-16 12:26:56 >> 
+not writable cause being used by: 15
+02-16 12:27:03 >> 
+going to unlock original content: {"waiting": [12], "using": [11, 13]}
+02-16 12:27:03 >> 
+remove waiting 12
+02-16 12:27:03 >> 
+no need to remove using of 12
+02-16 12:27:03 >> 
+writes: {"waiting": [], "using": [11, 13]}
+02-16 12:27:03 >> 
+going to exit

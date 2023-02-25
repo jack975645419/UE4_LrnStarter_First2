@@ -25,6 +25,7 @@ content = content.replace("${{NODES}}", sys.argv[3])
 content = content.replace("${{DELAY_START}}", sys.argv[4])
 content = content.replace("${{LOCK}}", sys.argv[5])
 content = content.replace("${{PREFER_MASK_STR}}", sys.argv[6])
+content = content.replace("${{TOLERANCE}}", sys.argv[7])
 
-write_file(sys.argv[7], content)
+write_file(sys.argv[8], content)
 

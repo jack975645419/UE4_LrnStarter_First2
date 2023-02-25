@@ -1,0 +1,25 @@
+02-16 12:17:09 >> 
+INFO: 
+BK_CI_BUILD_NUM = 14
+BK_CI_PIPELINE_ID = testing
+NODES = node1,Engine_Bake_3090_02
+DELAY_START = 200
+MUTEX_OP = 2
+NODES_NUM = 2
+LOG_NAME = testing.14.UNLOCK.log
+PREFER_LIST = [1, 1]
+ 
+02-16 12:17:09 >> 
+DelayStart: 200
+02-16 12:20:29 >> 
+original content: {"waiting": [], "using": [0, 14]}
+02-16 12:20:31 >> 
+going to unlock original content: {"waiting": [], "using": [0, 14]}
+02-16 12:20:31 >> 
+no need to remove waiting of: 14
+02-16 12:20:31 >> 
+removing using of 14
+02-16 12:20:31 >> 
+writes: {"waiting": [], "using": [0, 0]}
+02-16 12:20:31 >> 
+going to exit

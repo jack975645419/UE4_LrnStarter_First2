@@ -24,8 +24,8 @@ import os, json, time, random
 BK_CI_BUILD_NUM     = ${{BUILD_NUM}}          # 构建号 （-1表示重置json）
 BK_CI_PIPELINE_ID   = "${{PIPELINE_ID}}"        # 流水线
 NODES               = "${{NODES}}"              # 机器名称列表用 逗号隔开
-DELAY_START         = ${{DELAY_START}}          # 延迟启动，默认是0
-
+DELAY_START         = ${{DELAY_START}}          # 延迟启动，默认是0，单位是s
+TOLERANCE           = ${{TOLERANCE}}          # 容忍时长，单位是min，默认是4320，表示3天，在sleep时触发，如果超过了容忍时长，将会取消本次的操作
 PREFER_MASK_STR         = "${{PREFER_MASK_STR}}"        # 偏好，例如是 1,1,1,0,0 表示只使用前面提供的三台机器，如果没有提供，那么用1来补齐
 
 _LOCK = 1 # 表示进入的位置
@@ -250,6 +250,38 @@ def runnable():
     if read_file_plain(PY_MUTEX_FILE) == str(BK_CI_BUILD_NUM):
         time.sleep("")
 
+def unlock_it_and_exit(with_exception:bool = False):
+    global OBJ
+    while True:
+        if not writable():
+            sleeps(5) #只是争取写的权限，可以短暂睡眠
+            continue
+
+        try:
+            content = read_file_plain(FILE_NAME)
+            logs ("going to unlock original content: " + content)
+            OBJ = json.loads(content)
+            remove_waiting(BK_CI_BUILD_NUM)
+            remove_using(BK_CI_BUILD_NUM)
+            if not try_to_write(FILE_NAME): # 没写成功将会重新走unlock流程
+                release_writable()
+                continue
+        except:
+            logs ("read fails (80)")
+            release_writable()
+            sleeps(SLEEP_TIME)
+            continue
+
+        release_writable()
+
+        if with_exception:
+            raise "time is up!!"
+
+        exit_script() #【退出】
+
+def time_to_up():
+    return TOLERANCE > 0 and time.time() - PY_START_TIME > TOLERANCE * 60
+
 # 程序开始
 logs (f"INFO: \nBK_CI_BUILD_NUM = {BK_CI_BUILD_NUM}\nBK_CI_PIPELINE_ID = {BK_CI_PIPELINE_ID}\nNODES = {NODES}\nDELAY_START = {DELAY_START}\nMUTEX_OP = {MUTEX_OP}\nNODES_NUM = {NODES_NUM}\nLOG_NAME = {LOG_NAME}\nPREFER_LIST = {PREFER_MASK_LIST}\n ")
 
@@ -262,6 +294,7 @@ if DELAY_START > 0:
     logs("DelayStart: " + str(DELAY_START))
     sleeps(DELAY_START)
 
+PY_START_TIME = time.time()
 
 # 存入初始文件
 if BK_CI_BUILD_NUM == -1:
@@ -283,14 +316,27 @@ else:
 
 if needReset:
     reset_file()
+
 if BK_CI_BUILD_NUM == -1:
     # 如果是-1则还有一个操作需要处理，那就是将PyRun锁给删除掉。
-    os.remove(PY_MUTEX_FILE)
-    logs("cause Build_Num is -1, remove PyMutexFile")
-    exit_script()
+    counter = 1
+    while True:
+        if os.path.exists(PY_MUTEX_FILE):
+            logs(f"cause Build_Num is -1, remove PyMutexFile (No. {counter}) and sleep 10s ")
+            counter += 1
+            reset_file()
+            os.remove(PY_MUTEX_FILE)
+            sleeps(10)
+            continue
+        
+        exit_script()
 
 if MUTEX_OP == _LOCK:
     while True:
+        if time_to_up():
+            print ("time is up!")
+            unlock_it_and_exit(with_exception=True)
+
         if not writable():
             sleeps(5) #只是争取写的权限，可以短暂睡眠
             continue
@@ -340,27 +386,7 @@ if MUTEX_OP == _LOCK:
         exit_script() #【退出】
 
 elif MUTEX_OP == _UNLOCK:
-    while True:
-        if not writable():
-            sleeps(5) #只是争取写的权限，可以短暂睡眠
-            continue
-
-        try:
-            content = read_file_plain(FILE_NAME)
-            logs ("going to unlock original content: " + content)
-            OBJ = json.loads(content)
-            remove_waiting(BK_CI_BUILD_NUM)
-            remove_using(BK_CI_BUILD_NUM)
-            if not try_to_write(FILE_NAME): # 没写成功将会重新走unlock流程
-                release_writable()
-                continue
-        except:
-            logs ("read fails (80)")
-            release_writable()
-            sleeps(SLEEP_TIME)
-            continue
-        release_writable()
-        exit_script() #【退出】
+    unlock_it_and_exit()
 else:
     raise "invalid"
 
