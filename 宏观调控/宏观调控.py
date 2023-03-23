@@ -13,8 +13,8 @@
 1. 全部都能正常退出，脚本不会报错
 2. Mutex_testing.json 最终会归零
 3. PyRunLock_testing.json 最终会归零
-
 4. 修改好了该脚本后，要记得在 【工具_调查构建机磁盘空间】 线里做检验。
+5. 返回USABLE表示是否有可用资源
 
 最终：要保管好这个脚本文件
 
@@ -28,10 +28,21 @@ DELAY_START         = ${{DELAY_START}}          # 延迟启动，默认是0，�
 TOLERANCE           = ${{TOLERANCE}}          # 容忍时长，单位是min，默认是4320，表示3天，在sleep时触发，如果超过了容忍时长，将会取消本次的操作
 PREFER_MASK_STR         = "${{PREFER_MASK_STR}}"        # 偏好，例如是 1,1,1,0,0 表示只使用前面提供的三台机器，如果没有提供，那么用1来补齐
 
+FOR_FINAL = False 
+
 _LOCK = 1 # 表示进入的位置
 _UNLOCK = 2 #表示退出的位置
+_INQUIRY = 3 # 表示仅仅查询是否有空闲的资源
 
-MUTEX_OP = _LOCK if "${{LOCK}}" == "true" else _UNLOCK
+if "${{LOCK}}" == "true":
+    MUTEX_OP = _LOCK
+elif "${{LOCK}}" == "false":
+    MUTEX_OP = _UNLOCK
+else: # "${{LOCK}}" == "inquiry":
+    MUTEX_OP = _INQUIRY
+
+# MUTEX_OP = _UNLOCK 
+
 SLEEP_TIME = 60
 NODES_LIST = NODES.split(',')
 NODES_NUM = len(NODES_LIST)
@@ -148,6 +159,20 @@ def custom_usable_condition(nodeName):
         return curHour >= 21 or curHour <= 10
     return True
 
+# 前提：OBJ、NODES_LIST、PREFER_MASK_LIST等都是可用的
+def get_usable_node_index() -> int:
+    validHandle = -1
+
+    for va in range(NODES_NUM):
+        if PREFER_MASK_LIST[va] == 1 and OBJ["using"][va] == 0:
+            if not custom_usable_condition(NODES_LIST[va]):
+                logs (f"special condition not satisfied: {NODES_LIST[va]} {va}")
+                continue
+            validHandle = va
+            break
+        
+    return validHandle
+
 # 返回 -1 表示用不了
 def occupy(num)->int:
     while len(OBJ["using"]) < NODES_NUM:
@@ -155,16 +180,7 @@ def occupy(num)->int:
     if len(OBJ["using"]) > NODES_NUM:
         OBJ["using"] = OBJ["using"][0:NODES_NUM]
 
-    validHandle = -1
-
-    for va in range(NODES_NUM):
-
-        if PREFER_MASK_LIST[va] == 1 and OBJ["using"][va] == 0:
-            if not custom_usable_condition(NODES_LIST[va]):
-                logs (f"special condition not satisfied: {NODES_LIST[va]} {va}")
-                continue
-            validHandle = va
-            break
+    validHandle = get_usable_node_index()
 
     if validHandle == -1:
         return -1
@@ -387,6 +403,15 @@ if MUTEX_OP == _LOCK:
 
 elif MUTEX_OP == _UNLOCK:
     unlock_it_and_exit()
+
+# 查询
+elif MUTEX_OP == _INQUIRY:
+    logs (f"Now is checking {FILE_NAME}")
+    OBJ = json.loads(read_file_plain(FILE_NAME))
+    logs ("@ " + str(OBJ))
+    handle = get_usable_node_index()
+    logs ("setEnv USABLE {}".format("true" if handle != -1 else "false"))
+
 else:
     raise "invalid"
 
