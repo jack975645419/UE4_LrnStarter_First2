@@ -41,7 +41,9 @@ elif "${{LOCK}}" == "false":
 else: # "${{LOCK}}" == "inquiry":
     MUTEX_OP = _INQUIRY
 
-# MUTEX_OP = _UNLOCK 
+if FOR_FINAL:
+    MUTEX_OP = _UNLOCK 
+    DELAY_START = 0
 
 SLEEP_TIME = 60
 NODES_LIST = NODES.split(',')
