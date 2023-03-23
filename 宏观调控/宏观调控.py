@@ -45,7 +45,7 @@ if FOR_FINAL:
     MUTEX_OP = _UNLOCK 
     DELAY_START = 0
 
-SLEEP_TIME = 60
+SLEEP_TIME = 30
 NODES_LIST = NODES.split(',')
 NODES_NUM = len(NODES_LIST)
 LOGS = list()
@@ -194,18 +194,19 @@ def change_sleep_time():
     global SLEEP_TIME # 经验：如果要改变全局变量，那么就声明global
     # 最小等待中
     if minimal_waiting() == BK_CI_BUILD_NUM:
-        SLEEP_TIME = 30
+        SLEEP_TIME = 4
         logs (f"set sleep time as {SLEEP_TIME} cause it is minimal waiting {BK_CI_BUILD_NUM} = minimal_waiting {minimal_waiting()} and waiting = {str(OBJ['waiting'])}")
         return
 
-    # 其它情况
+    # 其它情况，等待20s到2分钟
     num = len(OBJ["waiting"]) + len(OBJ["using"])
-    _1min = 60
-    _8mins = 8 * 60
-    base = clamp(num * 30, _1min, _8mins)
+    _30s = 30
+    # _8mins = 2 * 60
+    # base = clamp(num * 30, _30s, _8mins)
+    base = _30s
     offset = random.randrange(-5, 5)
     SLEEP_TIME = base + offset
-    print (f"set sleep_time as base {base} = clamp( {num} * 30, 1min, 8min), and offset = {offset}, finally as {SLEEP_TIME}")
+    print (f"set sleep_time as base {base} = 30s , and offset = {offset}, finally as {SLEEP_TIME}")
 
 def sleeps_with_changing_time():
     change_sleep_time()
