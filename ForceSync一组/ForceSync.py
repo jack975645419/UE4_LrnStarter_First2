@@ -8,6 +8,7 @@
 
 '''
 
+print ("如果报错win32api找不到，那么先运行 pip install pywin32")
 import os, socket, subprocess, win32api, sys
 from subprocess import Popen, PIPE, STDOUT
 

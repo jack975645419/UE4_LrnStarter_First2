@@ -55,6 +55,7 @@ LOG_NAME = f"{BK_CI_PIPELINE_ID}.{BK_CI_BUILD_NUM}.{'LOCK' if MUTEX_OP == _LOCK 
 OBJ = {"waiting": [], "using": []}
 PY_MUTEX_FILE = f"PyRunLock_{BK_CI_PIPELINE_ID}.json"
 FILE_PATH = "Lock.txt"
+LAST_CONTENT_MAYBE_ERROR = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"] # 一共18个0
 
 if PREFER_MASK_STR == "":
     PREFER_MASK_STR = "1"
@@ -217,12 +218,35 @@ def writable():
     content = read_file_plain(PY_MUTEX_FILE)
     if content == "0" or content == str(BK_CI_BUILD_NUM):
         write_file(PY_MUTEX_FILE, str(BK_CI_BUILD_NUM))
+        watching_invalid_locker("0")
         sleeps(2)
         content = read_file_plain(PY_MUTEX_FILE)
         return content == str(BK_CI_BUILD_NUM)
     else:
         logs ("not writable cause being used by: " + content)
+        watching_invalid_locker(content)
         return False
+
+# 全部数字都一致，并且值不为0，那么认为卡住了
+def is_stuck_list(l):
+    c = LAST_CONTENT_MAYBE_ERROR[0]
+    if c == "0":
+        return False
+    for i in LAST_CONTENT_MAYBE_ERROR:
+        if c != i:
+            return False
+    return True
+
+def watching_invalid_locker(content: str):
+    global LAST_CONTENT_MAYBE_ERROR
+    LAST_CONTENT_MAYBE_ERROR = LAST_CONTENT_MAYBE_ERROR[1:]
+    LAST_CONTENT_MAYBE_ERROR.append(content)
+    print ("watch possible invalid locker: " + str(LAST_CONTENT_MAYBE_ERROR))
+
+    stuck = is_stuck_list(LAST_CONTENT_MAYBE_ERROR)
+    if stuck:
+        print ("cause stuck, forcely release writable (write 0 actively)!!!!")
+        release_writable()
 
 def release_writable():
     content = read_file_plain(PY_MUTEX_FILE)
